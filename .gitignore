@@ -1,0 +1,46 @@
+# Build artifacts
+/build/
+/CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
+# Compiled source files
+*.o
+*.obj
+*.lo
+*.la
+*.a
+*.lib
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executable files
+*.exe
+*.out
+*.app
+
+# Debugging files
+*.dSYM/
+*.stackdump
+vgcore.*
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.pid
+*.gz
+
+# IDE-specific files
+.idea/
+.vscode/
+*.code-workspace
+
+# System files
+.DS_Store
+Thumbs.db
