@@ -8,8 +8,11 @@
 #include <sstream>
 #include <thread>
 #include <cstring>
-#include "routes/auth/register.hpp" 
-#include "routes/404NotFound.hpp" 
+#include <fcntl.h>
+#include <cerrno>
+#include "routes/auth/register.hpp"
+#include "routes/404NotFound.hpp"
+#include "utils/helper.hpp"
 
 class Server
 {
@@ -22,7 +25,7 @@ public:
         bindSocket(sockfd);
         listenOnSocket(sockfd);
 
-        std::cout << "Server started on Port : " << port_ << std::endl;
+        std::cout << "Server started on Port : " << port_ << " (IPv6)" << std::endl;
 
         while (true)
         {
@@ -39,7 +42,7 @@ private:
 
     int createSocket()
     {
-        int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        int sockfd = socket(AF_INET6, SOCK_STREAM, 0);
         if (sockfd < 0)
         {
             perror("Error opening socket");
@@ -50,10 +53,10 @@ private:
 
     void bindSocket(int sockfd)
     {
-        struct sockaddr_in serverAddr = {};
-        serverAddr.sin_family = AF_INET;
-        serverAddr.sin_addr.s_addr = INADDR_ANY;
-        serverAddr.sin_port = htons(port_);
+        struct sockaddr_in6 serverAddr = {};
+        serverAddr.sin6_family = AF_INET6;
+        serverAddr.sin6_addr = in6addr_any;
+        serverAddr.sin6_port = htons(port_);
 
         if (bind(sockfd, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0)
         {
@@ -73,7 +76,7 @@ private:
 
     int acceptConnection(int sockfd)
     {
-        struct sockaddr_in clientAddr = {};
+        struct sockaddr_in6 clientAddr = {};
         socklen_t clientLen = sizeof(clientAddr);
         int newsockfd = accept(sockfd, (struct sockaddr *)&clientAddr, &clientLen);
         if (newsockfd < 0)
@@ -86,12 +89,13 @@ private:
 
     void handleRequest(int clientSockfd)
     {
-        char buffer[1024];
+        char buffer[4096];
         memset(buffer, 0, sizeof(buffer));
-        int n = read(clientSockfd, buffer, sizeof(buffer) - 1);
+
+        int n = recv(clientSockfd, buffer, sizeof(buffer) - 1, 0);
         if (n < 0)
         {
-            perror("Error on reading");
+            perror("Error on receiving");
             close(clientSockfd);
             return;
         }
@@ -101,9 +105,29 @@ private:
         std::string method, path, version;
         requestStream >> method >> path >> version;
 
+        std::string body;
+        std::string line;
+        bool bodyFlag = false;
+        while (std::getline(requestStream, line))
+        {
+            if (line.empty())
+            {
+                break;
+            }
+            if (bodyFlag)
+            {
+                body = line;
+                bodyFlag = false;
+            }
+            if (line[0] == 13)
+            {
+                bodyFlag=true;
+            }
+        }
+
         if (path == "/auth")
         {
-            handleRegister(clientSockfd, method, path);
+            handleRegister(clientSockfd, method, path, body);
         }
         else
         {

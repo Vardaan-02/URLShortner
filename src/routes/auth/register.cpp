@@ -1,34 +1,35 @@
 #include "routes/auth/register.hpp"
+#include "response.hpp"
+#include "utils/helper.hpp"
+#include "request-parser/auth/register.parser.hpp"
 #include <sys/socket.h>
 #include <unistd.h>
 #include <string>
 #include <iostream>
 
-void handleRegister(int clientSockfd, const std::string &method, const std::string &path)
+void handleRegister(int clientSockfd, const std::string &method, const std::string &path, const std::string &body)
 {
     if (method == "GET")
     {
-        std::string body = "<html><body><h1>Hello World!</h1></body></html>";
-        std::string response =
-            "HTTP/1.1 200 OK\r\n"
-            "Content-Type: text/html\r\n"
-            "Connection: close\r\n"
-            "Content-Length: " + std::to_string(body.size()) + "\r\n"
-            "\r\n" +
-            body;
-
-        if (write(clientSockfd, response.c_str(), response.size()) < 0)
+        std::string body = readHtmlFile("/home/vardaan/low level coding/Web Server/public/register.html");
+        std::string response = generateResponse(200, "OK", "text/html", body);
+        sendResponse(clientSockfd, response);
+    }
+    else if (method == "POST")
+    {
+        std::map<std::string, std::string> parsedData = parseQueryString(body);
+        for (const auto &pair : parsedData)
         {
-            perror("Error writing to socket");
+            std::cout << pair.first << ": " << pair.second << std::endl;
         }
-
-        shutdown(clientSockfd, SHUT_RDWR);
-        close(clientSockfd);
+        std::string body = "Registration Completed";
+        std::string response = generateResponse(200, "OK", "text", body);
+        sendResponse(clientSockfd, response);
     }
     else
     {
-        std::cerr << "Unsupported HTTP method: " << method << std::endl;
-        shutdown(clientSockfd, SHUT_RDWR);
-        close(clientSockfd);
+        std::string body = "Unsupported HTTP method: " + method;
+        std::string response = generateResponse(405, "Method Not Allowed", "text/plain", body);
+        sendResponse(clientSockfd, response);
     }
 }

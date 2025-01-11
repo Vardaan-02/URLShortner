@@ -3,6 +3,6 @@
 
 #include <string>
 
-void handleRegister(int clientSockfd, const std::string &method, const std::string &path);
+void handleRegister(int clientSockfd, const std::string &method, const std::string &path,const std::string &body);
 
 #endif 
