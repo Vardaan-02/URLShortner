@@ -1,6 +1,7 @@
 #include "routes/auth/register.hpp"
 #include "response.hpp"
 #include "utils/helper.hpp"
+#include "database/user.hpp"
 #include "request-parser/auth/register.parser.hpp"
 #include <sys/socket.h>
 #include <unistd.h>
@@ -12,24 +13,43 @@ void handleRegister(int clientSockfd, const std::string &method, const std::stri
     if (method == "GET")
     {
         std::string body = readHtmlFile("/home/vardaan/low level coding/Web Server/public/register.html");
-        std::string response = generateResponse(200, "OK", "text/html", body);
+        std::string response = generateResponse(200, "OK", "text/html", body,{});
         sendResponse(clientSockfd, response);
     }
     else if (method == "POST")
     {
         std::map<std::string, std::string> parsedData = parseQueryString(body);
-        for (const auto &pair : parsedData)
+
+        if (parsedData.find("email") == parsedData.end() || parsedData.find("password") == parsedData.end() || parsedData.find("confirmPassword") == parsedData.end() || parsedData.find("username") == parsedData.end())
         {
-            std::cout << pair.first << ": " << pair.second << std::endl;
+            std::string response = generateResponse(400, "Bad Request", "text/plain", "Missing email or password",{});
+            sendResponse(clientSockfd, response);
+            return;
         }
-        std::string body = "Registration Completed";
-        std::string response = generateResponse(200, "OK", "text", body);
+
+        std::string response;
+        if (!isValidEmail(parsedData["email"]))
+        {
+            response = generateResponse(400, "Bad Request", "text", "Email not valid",{});
+            sendResponse(clientSockfd, response);
+        }
+        if (parsedData["password"].compare(parsedData["confirmPassword"]))
+        {
+            response = generateResponse(400, "Bad Request", "text", "Password does not match Confirm Password",{});
+            sendResponse(clientSockfd, response);
+        }
+        string salt = generateSalt(16);
+        string saltedPassword = salt + parsedData["password"];
+        string hashedPassword = hashPassword(saltedPassword);
+        User user(parsedData["username"], parsedData["email"], saltedPassword, salt);
+        user.serialize("/home/vardaan/low level coding/Web Server/data/database.txt");
+        response = generateResponse(200, "OK", "text", "Registration Successful",{});
         sendResponse(clientSockfd, response);
     }
     else
     {
         std::string body = "Unsupported HTTP method: " + method;
-        std::string response = generateResponse(405, "Method Not Allowed", "text/plain", body);
+        std::string response = generateResponse(405, "Method Not Allowed", "text/plain", body,{});
         sendResponse(clientSockfd, response);
     }
 }

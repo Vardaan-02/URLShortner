@@ -11,6 +11,9 @@
 #include <fcntl.h>
 #include <cerrno>
 #include "routes/auth/register.hpp"
+#include "routes/auth/login.hpp"
+#include "routes/user/get-user.hpp"
+#include "routes/user/get-all-users.hpp"
 #include "routes/404NotFound.hpp"
 #include "utils/helper.hpp"
 
@@ -103,6 +106,7 @@ private:
         std::string request(buffer);
         std::istringstream requestStream(request);
         std::string method, path, version;
+        std::string refreshToken;
         requestStream >> method >> path >> version;
 
         std::string body;
@@ -121,13 +125,28 @@ private:
             }
             if (line[0] == 13)
             {
-                bodyFlag=true;
+                bodyFlag = true;
+            }
+            if(line.find("Cookie")!=std::string::npos){
+                refreshToken = extractRefreshToken(line);
             }
         }
 
-        if (path == "/auth")
+        if (path == "/register")
         {
             handleRegister(clientSockfd, method, path, body);
+        }
+        else if (path == "/login")
+        {
+            handleLogin(clientSockfd, method, path, body);
+        }
+        else if (path == "/get-user")
+        {
+            getUserByEmail(clientSockfd, method, path, body);
+        }
+        else if (path == "/get-all-users")
+        {
+            getAllUsers(clientSockfd, method, path, body,refreshToken);
         }
         else
         {

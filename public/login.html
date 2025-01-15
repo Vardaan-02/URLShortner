@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registration Form</title>
+    <title>Login</title>
     <style>
       * {
         margin: 0;
@@ -60,16 +60,10 @@
         font-size: 16px;
       }
 
-      .input-group small {
-        color: red;
-        display: none;
-        font-size: 12px;
-      }
-
       button {
         width: 100%;
         padding: 12px;
-        background-color: #28a745;
+        background-color: #007bff;
         color: white;
         border: none;
         border-radius: 5px;
@@ -78,7 +72,7 @@
       }
 
       button:hover {
-        background-color: #218838;
+        background-color: #0056b3;
       }
 
       p {
@@ -98,37 +92,20 @@
   </head>
   <body>
     <div class="container">
-      <div class="form-container" >
-        <h2>Sign Up</h2>
-        <form id="registerForm" method="POST" action="http://localhost:8080/register">
-          <div class="input-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required />
-            <small id="usernameError"></small>
-          </div>
+      <div class="form-container">
+        <h2>Login</h2>
+        <form id="loginForm" method="POST" action="http://localhost:8080/login">
           <div class="input-group">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required />
-            <small id="emailError"></small>
           </div>
           <div class="input-group">
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required />
-            <small id="passwordError"></small>
           </div>
-          <div class="input-group">
-            <label for="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              required
-            />
-            <small id="confirmPasswordError"></small>
-          </div>
-          <button type="submit">Register</button>
+          <button type="submit">Login</button>
         </form>
-        <p>Already have an account? <a href="http://localhost:8080/login">Login</a></p>
+        <p>Don't have an account? <a href="http://localhost:8080/register">Register</a></p>
       </div>
     </div>
   </body>
