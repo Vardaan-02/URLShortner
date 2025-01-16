@@ -26,6 +26,27 @@ std::string generateResponse(int statusCode, const std::string &statusMessage,
     return response;
 }
 
+std::string redirectResponse(int statusCode, const std::string &statusMessage,
+                             const std::string &contentType, const std::string &body,
+                             const std::vector<std::pair<std::string, std::string>> &customHeaders)
+{
+    std::string response =
+        "HTTP/1.1 " + std::to_string(statusCode) + " " + statusMessage + "\r\n" +
+        "Content-Type: " + contentType + "\r\n" +
+        "Connection: close\r\n";
+
+    response += "Content-Length: 0\r\n";
+
+    for (const auto &header : customHeaders) {
+        response += header.first + ": " + header.second + "\r\n";
+    }
+
+    response += "\r\n";
+
+    return response;
+}
+
+
 void sendResponse(int clientSockfd, const std::string &response)
 {
     if (write(clientSockfd, response.c_str(), response.size()) < 0)

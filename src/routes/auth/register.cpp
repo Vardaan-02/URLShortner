@@ -38,10 +38,10 @@ void handleRegister(int clientSockfd, const std::string &method, const std::stri
             response = generateResponse(400, "Bad Request", "text", "Password does not match Confirm Password",{});
             sendResponse(clientSockfd, response);
         }
-        string salt = generateSalt(16);
-        string saltedPassword = salt + parsedData["password"];
-        string hashedPassword = hashPassword(saltedPassword);
-        User user(parsedData["username"], parsedData["email"], saltedPassword, salt);
+        std::string salt = generateSalt(16);
+        std::string saltedPassword = salt + parsedData["password"];
+        std::string hashedPassword = hashPassword(saltedPassword);
+        User user(parsedData["username"], parsedData["email"], hashedPassword, salt);
         user.serialize("/home/vardaan/low level coding/Web Server/data/database.txt");
         response = generateResponse(200, "OK", "text", "Registration Successful",{});
         sendResponse(clientSockfd, response);

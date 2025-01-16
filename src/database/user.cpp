@@ -10,8 +10,8 @@ using namespace std;
 User::User(const string &username, const string &email, const string &password, const string &salt)
     : username(username), email(email), password(password), salt(salt), free_trails_left(3) {}
 
-User::User(const string &username, const string &email, const string &password, const string &salt, int free_trails_left, const string &session_token)
-    : username(username), email(email), password(password), salt(salt), free_trails_left(free_trails_left), session_token(session_token) {}
+User::User(const string &username, const string &email, const string &password, const string &salt, int free_trails_left, const string &session_token, const vector<string> &url_history_long, const vector<string> &url_history_short)
+    : username(username), email(email), password(password), salt(salt), free_trails_left(free_trails_left), session_token(session_token), url_history_long(url_history_long), url_history_short(url_history_short) {}
 
 string User::getUsername() const { return username; }
 void User::setUsername(const string &username) { this->username = username; }
@@ -52,7 +52,9 @@ void User::serialize(const string &filename) const
              << password << ","
              << salt << ","
              << free_trails_left << ","
-             << session_token << "\n";
+             << session_token << ","
+             << join(url_history_long, " ") << ","
+             << join(url_history_short, " ") << "\n";
         file.close();
     }
     else
@@ -72,7 +74,7 @@ User User::deserialize(const string &filename, int line_number)
         if (current_line == line_number)
         {
             stringstream ss(line);
-            string username, email, password, session_token, salt;
+            string username, email, password, session_token, salt, long_history, short_history;
             int free_trails_left;
 
             getline(ss, username, ',');
@@ -82,9 +84,15 @@ User User::deserialize(const string &filename, int line_number)
             ss >> free_trails_left;
             ss.ignore(1, ',');
             getline(ss, session_token, ',');
+            getline(ss, long_history, ',');
+            getline(ss, short_history, ',');
 
             file.close();
-            return User(username, email, password, salt, free_trails_left, session_token);
+
+            vector<string> url_history_long = split(long_history, " ");
+            vector<string> url_history_short = split(short_history, " ");
+
+            return User(username, email, password, salt, free_trails_left, session_token, url_history_long, url_history_short);
         }
         current_line++;
     }
@@ -95,30 +103,30 @@ User User::deserialize(const string &filename, int line_number)
 
 User User::fetchUserByEmail(const std::string &filename, const std::string &email)
 {
-    std::ifstream file(filename);
+    ifstream file(filename);
     if (!file.is_open())
     {
-        throw std::runtime_error("Could not open file: " + filename);
+        throw runtime_error("Could not open file: " + filename);
     }
 
-    std::string line;
+    string line;
     int current_line = 0;
 
-    while (std::getline(file, line))
+    while (getline(file, line))
     {
-        std::stringstream ss(line);
-        std::string username, user_email, password, session_token, salt;
+        stringstream ss(line);
+        string username, user_email, password, session_token, salt;
         int free_trails_left;
 
-        std::getline(ss, username, ',');
-        std::getline(ss, user_email, ',');
-        std::getline(ss, password, ',');
-        std::getline(ss, salt, ',');
+        getline(ss, username, ',');
+        getline(ss, user_email, ',');
+        getline(ss, password, ',');
+        getline(ss, salt, ',');
         ss >> free_trails_left;
         ss.ignore(1, ',');
-        std::getline(ss, session_token, ',');
+        getline(ss, session_token, ',');
 
-        if (user_email.compare(email) || user_email == email)
+        if (user_email == email || !user_email.compare(email))
         {
             file.close();
             return User(username, user_email, password, salt, free_trails_left, session_token);
@@ -126,59 +134,59 @@ User User::fetchUserByEmail(const std::string &filename, const std::string &emai
         current_line++;
     }
     file.close();
-    throw std::runtime_error("User with email " + email + " not found.");
+    throw runtime_error("User with email " + email + " not found.");
 }
 
 void User::deleteUser(const std::string &filename)
 {
-    std::ifstream file(filename);
+    ifstream file(filename);
     if (!file.is_open())
     {
-        throw std::runtime_error("Could not open file: " + filename);
+        throw runtime_error("Could not open file: " + filename);
     }
 
-    std::vector<std::string> lines;
-    std::string line;
+    vector<string> lines;
+    string line;
 
-    while (std::getline(file, line))
+    while (getline(file, line))
     {
         lines.push_back(line);
     }
 
     file.close();
 
-    auto it = std::remove_if(lines.begin(), lines.end(), [&](const std::string &entry)
-                             {
-        std::stringstream ss(entry);
-        std::string username, user_email, password, session_token, salt;
+    auto it = remove_if(lines.begin(), lines.end(), [&](const string &entry)
+                        {
+        stringstream ss(entry);
+        string username, user_email, password, session_token, salt;
         int free_trails_left;
-        
-        std::getline(ss, username, ',');
-        std::getline(ss, user_email, ',');
-        std::getline(ss, password, ',');
-        std::getline(ss, salt, ',');
+
+        getline(ss, username, ',');
+        getline(ss, user_email, ',');
+        getline(ss, password, ',');
+        getline(ss, salt, ',');
         ss >> free_trails_left;
         ss.ignore(1, ',');
-        std::getline(ss, session_token, ',');
-        
-        return user_email == email || user_email.compare(email); });
+        getline(ss, session_token, ',');
+
+        return (user_email == email || !user_email.compare(email)); });
 
     if (it == lines.end())
     {
-        throw std::runtime_error("User with email " + email + " not found.");
+        throw runtime_error("User with email " + email + " not found.");
     }
 
     lines.erase(it, lines.end());
 
-    std::ofstream out_file(filename, std::ios::trunc);
+    ofstream out_file(filename, ios::trunc);
     if (!out_file.is_open())
     {
-        throw std::runtime_error("Could not open file for writing: " + filename);
+        throw runtime_error("Could not open file for writing: " + filename);
     }
 
     for (const auto &entry : lines)
     {
-        out_file << entry << std::endl;
+        out_file << entry << endl;
     }
 
     out_file.close();
@@ -186,37 +194,73 @@ void User::deleteUser(const std::string &filename)
 
 User User::fetchUserByRefreshToken(const std::string &filename, const std::string &sessionToken)
 {
-    std::ifstream file(filename);
+    ifstream file(filename);
     if (!file.is_open())
     {
-        throw std::runtime_error("Could not open file: " + filename);
+        throw runtime_error("Could not open file: " + filename);
     }
 
-    std::string line;
+    string line;
     int current_line = 0;
 
-    while (std::getline(file, line))
+    while (getline(file, line))
     {
-        std::stringstream ss(line);
-        std::string user_username, user_email, user_password, user_session_token, user_salt;
+        stringstream ss(line);
+        string user_username, user_email, user_password, user_session_token, user_salt, long_history, short_history;
         int free_trails_left;
 
-        std::getline(ss, user_username, ',');
-        std::getline(ss, user_email, ',');
-        std::getline(ss, user_password, ',');
-        std::getline(ss, user_salt, ',');
+        getline(ss, user_username, ',');
+        getline(ss, user_email, ',');
+        getline(ss, user_password, ',');
+        getline(ss, user_salt, ',');
         ss >> free_trails_left;
         ss.ignore(1, ',');
-        std::getline(ss, user_session_token, ',');
+        getline(ss, user_session_token, ',');
+        getline(ss, long_history, ',');
+        getline(ss, short_history, ',');
 
-        if (user_session_token == sessionToken || user_session_token.compare(sessionToken))
+        if (user_session_token.substr(0,32) == sessionToken.substr(0,32))
         {
             file.close();
-            return User(user_username, user_email, user_password, user_salt, free_trails_left, user_session_token);
+
+            vector<string> url_history_long = split(long_history, " ");
+            vector<string> url_history_short = split(short_history, " ");
+
+            return User(user_username, user_email, user_password, user_salt, free_trails_left, user_session_token, url_history_long, url_history_short);
         }
         current_line++;
     }
 
     file.close();
-    throw std::runtime_error("Invalid Session Token");
+    throw runtime_error("Invalid Session Token");
+}
+
+
+string User::join(const vector<string> &vec, const string &delimiter)
+{
+    stringstream ss;
+    for (size_t i = 0; i < vec.size(); ++i)
+    {
+        ss << vec[i];
+        if (i != vec.size() - 1)
+            ss << delimiter;
+    }
+    return ss.str();
+}
+
+vector<string> User::split(const string &str, const string &delimiter)
+{
+    vector<string> tokens;
+    size_t start = 0;
+    size_t end = str.find(delimiter);
+
+    while (end != string::npos)
+    {
+        tokens.push_back(str.substr(start, end - start));
+        start = end + delimiter.length();
+        end = str.find(delimiter, start);
+    }
+    tokens.push_back(str.substr(start));
+
+    return tokens;
 }

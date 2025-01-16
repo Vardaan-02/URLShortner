@@ -14,6 +14,8 @@
 #include "routes/auth/login.hpp"
 #include "routes/user/get-user.hpp"
 #include "routes/user/get-all-users.hpp"
+#include "routes/url/url-shorten.hpp"
+#include "routes/url/redirect.hpp"
 #include "routes/404NotFound.hpp"
 #include "utils/helper.hpp"
 
@@ -147,6 +149,13 @@ private:
         else if (path == "/get-all-users")
         {
             getAllUsers(clientSockfd, method, path, body,refreshToken);
+        }
+        else if (path == "/url-shortener")
+        {
+            shortenURL(clientSockfd, method, path, body,refreshToken);
+        }
+        else if(path.find("/vardaan.ly")!=std::string::npos){
+            redirect(clientSockfd, method, path);
         }
         else
         {

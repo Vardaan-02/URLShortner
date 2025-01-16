@@ -78,7 +78,7 @@ std::string hashPassword(const std::string& password) {
 bool verifyPassword(const std::string& enteredPassword, const std::string& storedSalt, const std::string& storedHash) {
     std::string saltedPassword = storedSalt + enteredPassword;
     std::string computedHash = hashPassword(saltedPassword);
-    return computedHash.compare(storedHash);
+    return !computedHash.compare(storedHash);
 }
 
 std::string generateSecureToken(size_t length = 32)
@@ -105,4 +105,14 @@ std::string extractRefreshToken(const std::string& cookie) {
         return cookie.substr(pos, end - pos);
     }
     return "";
+}
+
+std::string replacePlaceholder(std::string& str, const std::string& placeholder, const std::string& value)
+{
+    size_t pos = str.find(placeholder);
+    if (pos != std::string::npos)
+    {
+        str.replace(pos, placeholder.length(), value);
+    }
+    return str;
 }

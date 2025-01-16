@@ -20,4 +20,6 @@ bool verifyPassword(const std::string &enteredPassword, const std::string &store
 
 std::string extractRefreshToken(const std::string& cookie);
 
+std::string replacePlaceholder(std::string& str, const std::string& placeholder, const std::string& value);
+
 #endif

@@ -1,58 +1,60 @@
 #ifndef USER_HPP
 #define USER_HPP
 
-#include <vector>
 #include <string>
-using namespace std;
+#include <vector>
 
 class User
 {
 private:
-    string username;
-    string email;
-    string password;
-    string salt;
-    vector<string> url_history_long;
-    vector<string> url_history_short;
+    std::string username;
+    std::string email;
+    std::string password;
+    std::string salt;
     int free_trails_left;
-    string session_token;
+    std::string session_token;
+    std::vector<std::string> url_history_long;
+    std::vector<std::string> url_history_short;
 
 public:
-    User(const string &username, const string &email, const string &password, const string &salt);
-    User(const string &username, const string &email, const string &password, const string &salt, int free_trails_left, const string &session_token);
+    User(const std::string &username, const std::string &email, const std::string &password, const std::string &salt);
+    User(const std::string &username, const std::string &email, const std::string &password, const std::string &salt, int free_trails_left, const std::string &session_token, const std::vector<std::string> &url_history_long = {}, const std::vector<std::string> &url_history_short = {});
 
-    string getUsername() const;
-    void setUsername(const string &username);
+    std::string getUsername() const;
+    void setUsername(const std::string &username);
 
-    string getEmail() const;
-    void setEmail(const string &email);
+    std::string getEmail() const;
+    void setEmail(const std::string &email);
 
-    string getPassword() const;
-    void setPassword(const string &password);
+    std::string getPassword() const;
+    void setPassword(const std::string &password);
 
-    string getSalt() const;
-    void setSalt(const string &salt);
+    std::string getSalt() const;
+    void setSalt(const std::string &salt);
 
-    vector<string> getUrlHistoryLong() const;
-    void addUrlToHistoryLong(const string &long_url);
+    std::vector<std::string> getUrlHistoryLong() const;
+    void addUrlToHistoryLong(const std::string &long_url);
 
-    vector<string> getUrlHistoryShort() const;
-    void addUrlToHistoryShort(const string &short_url);
+    std::vector<std::string> getUrlHistoryShort() const;
+    void addUrlToHistoryShort(const std::string &short_url);
 
     int getFreeTrialsLeft() const;
     void decreaseFreeTrials();
 
-    string getSessionToken() const;
-    void setSessionToken(const string &token);
+    std::string getSessionToken() const;
+    void setSessionToken(const std::string &token);
     void removeSessionToken();
 
-    void serialize(const string &filename) const;
-    static User deserialize(const string &filename, int line_number);
+    void serialize(const std::string &filename) const;
+    static User deserialize(const std::string &filename, int line_number);
 
     static User fetchUserByEmail(const std::string &filename, const std::string &email);
     void deleteUser(const std::string &filename);
+    static User fetchUserByRefreshToken(const std::string &filename, const std::string &sessionToken);
 
-    static User fetchUserByRefreshToken(const std::string &filename, const std::string &email);
+private:
+    static std::string join(const std::vector<std::string> &vec, const std::string &delimiter);
+    static std::vector<std::string> split(const std::string &str, const std::string &delimiter);
 };
 
-#endif
+#endif 
