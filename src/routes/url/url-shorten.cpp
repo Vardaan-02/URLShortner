@@ -23,14 +23,14 @@ void shortenURL(int clientSockfd, const std::string &method, const std::string &
             std::vector<string> longUrl = user.getUrlHistoryLong();
             std::vector<string> shortUrl = user.getUrlHistoryShort();
 
-            std::string entry1 = "<tr><td>";
-            std::string entry2 = "</td><td>";
+            std::string entry1 = "<tr class=\"mt-6\"><td>";
+            std::string entry2 = "</td><td class=\"text-blue-500\">";
             std::string entry3 = "</td></tr>";
             std::string replace;
 
-            for (int i = 0; i < longUrl.size()-1; i++)
+            for (int i = 0; i < longUrl.size() - 1; i++)
             {
-                replace += entry1 + longUrl[i+1] + entry2 + shortUrl[i+1] + entry3;
+                replace += entry1 + longUrl[i + 1] + entry2 + shortUrl[i + 1] + entry3;
             }
 
             body = replacePlaceholder(body, "{{data}}", replace);

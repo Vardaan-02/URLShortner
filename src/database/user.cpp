@@ -115,21 +115,27 @@ User User::fetchUserByEmail(const std::string &filename, const std::string &emai
     while (getline(file, line))
     {
         stringstream ss(line);
-        string username, user_email, password, session_token, salt;
+        string user_username, user_email, user_password, user_session_token, user_salt, long_history, short_history;
         int free_trails_left;
 
-        getline(ss, username, ',');
+        getline(ss, user_username, ',');
         getline(ss, user_email, ',');
-        getline(ss, password, ',');
-        getline(ss, salt, ',');
+        getline(ss, user_password, ',');
+        getline(ss, user_salt, ',');
         ss >> free_trails_left;
         ss.ignore(1, ',');
-        getline(ss, session_token, ',');
+        getline(ss, user_session_token, ',');
+        getline(ss, long_history, ',');
+        getline(ss, short_history, ',');
 
         if (user_email == email || !user_email.compare(email))
         {
             file.close();
-            return User(username, user_email, password, salt, free_trails_left, session_token);
+
+            vector<string> url_history_long = split(long_history, " ");
+            vector<string> url_history_short = split(short_history, " ");
+
+            return User(user_username, user_email, user_password, user_salt, free_trails_left, user_session_token, url_history_long, url_history_short);
         }
         current_line++;
     }
@@ -219,7 +225,7 @@ User User::fetchUserByRefreshToken(const std::string &filename, const std::strin
         getline(ss, long_history, ',');
         getline(ss, short_history, ',');
 
-        if (user_session_token.substr(0,32) == sessionToken.substr(0,32))
+        if (user_session_token.substr(0, 32) == sessionToken.substr(0, 32))
         {
             file.close();
 
@@ -234,7 +240,6 @@ User User::fetchUserByRefreshToken(const std::string &filename, const std::strin
     file.close();
     throw runtime_error("Invalid Session Token");
 }
-
 
 string User::join(const vector<string> &vec, const string &delimiter)
 {

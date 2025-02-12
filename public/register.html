@@ -3,133 +3,130 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registration Form</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: "Arial", sans-serif;
-        background-color: #f4f7f6;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-
-      .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-      }
-
-      .form-container {
-        background-color: #fff;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 400px;
-      }
-
-      h2 {
-        text-align: center;
-        margin-bottom: 20px;
-      }
-
-      .input-group {
-        margin-bottom: 20px;
-      }
-
-      .input-group label {
-        display: block;
-        margin-bottom: 8px;
-        color: #555;
-      }
-
-      .input-group input {
-        width: 100%;
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #ddd;
-        font-size: 16px;
-      }
-
-      .input-group small {
-        color: red;
-        display: none;
-        font-size: 12px;
-      }
-
-      button {
-        width: 100%;
-        padding: 12px;
-        background-color: #28a745;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        cursor: pointer;
-      }
-
-      button:hover {
-        background-color: #218838;
-      }
-
-      p {
-        text-align: center;
-        margin-top: 20px;
-      }
-
-      p a {
-        color: #007bff;
-        text-decoration: none;
-      }
-
-      p a:hover {
-        text-decoration: underline;
-      }
-    </style>
+    <title>Sign Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <div class="container">
-      <div class="form-container" >
-        <h2>Sign Up</h2>
-        <form id="registerForm" method="POST" action="http://localhost:8080/register">
-          <div class="input-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required />
-            <small id="usernameError"></small>
-          </div>
-          <div class="input-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required />
-            <small id="emailError"></small>
-          </div>
-          <div class="input-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required />
-            <small id="passwordError"></small>
-          </div>
-          <div class="input-group">
-            <label for="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              required
-            />
-            <small id="confirmPasswordError"></small>
-          </div>
-          <button type="submit">Register</button>
-        </form>
-        <p>Already have an account? <a href="http://localhost:8080/login">Login</a></p>
-      </div>
+  <body class="flex items-center justify-center h-screen bg-gray-100">
+    <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+      <h2 class="text-2xl font-bold text-center mb-6">Sign Up</h2>
+      <form id="registerForm" class="space-y-4">
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700"
+            >Username</label
+          >
+          <input
+            type="text"
+            id="username"
+            name="username"
+            required
+            class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+          />
+          <small id="usernameError" class="text-red-500 text-xs hidden"></small>
+        </div>
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700"
+            >Email</label
+          >
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+          />
+          <small id="emailError" class="text-red-500 text-xs hidden"></small>
+        </div>
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700"
+            >Password</label
+          >
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+          />
+          <small id="passwordError" class="text-red-500 text-xs hidden"></small>
+        </div>
+        <div>
+          <label
+            for="confirmPassword"
+            class="block text-sm font-medium text-gray-700"
+            >Confirm Password</label
+          >
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            required
+            class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+          />
+          <small
+            id="confirmPasswordError"
+            class="text-red-500 text-xs hidden"
+          ></small>
+        </div>
+        <button
+          type="submit"
+          class="w-full px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600"
+        >
+          Register
+        </button>
+      </form>
+      <p class="mt-4 text-center text-sm">
+        Already have an account?
+        <a href="/login" class="text-blue-500 hover:underline">Login</a>
+      </p>
     </div>
+
+    <script>
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const username = document.getElementById("username").value;
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const confirmPassword =
+            document.getElementById("confirmPassword").value;
+
+          if (password !== confirmPassword) {
+            document.getElementById("confirmPasswordError").textContent =
+              "Passwords do not match";
+            document
+              .getElementById("confirmPasswordError")
+              .classList.remove("hidden");
+            return;
+          }
+          document
+            .getElementById("confirmPasswordError")
+            .classList.add("hidden");
+
+          const formData = new URLSearchParams();
+          formData.append("username", username);
+          formData.append("email", email);
+          formData.append("password", password);
+          formData.append("confirmPassword", confirmPassword);
+
+          try {
+            const response = await fetch("http://localhost:8080/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: "vardaan " + formData.toString(),
+            });
+            console.log(response.status == 200);
+            if (response) {
+              alert("Registration successful");
+              window.location.replace("http://localhost:8080/login");
+            } else {
+              alert(data.message || "Registration failed");
+            }
+          } catch (error) {
+            alert("An error occurred");
+          }
+        });
+    </script>
   </body>
 </html>

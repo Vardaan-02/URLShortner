@@ -4,109 +4,77 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: "Arial", sans-serif;
-        background-color: #f4f7f6;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-
-      .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-      }
-
-      .form-container {
-        background-color: #fff;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 400px;
-      }
-
-      h2 {
-        text-align: center;
-        margin-bottom: 20px;
-      }
-
-      .input-group {
-        margin-bottom: 20px;
-      }
-
-      .input-group label {
-        display: block;
-        margin-bottom: 8px;
-        color: #555;
-      }
-
-      .input-group input {
-        width: 100%;
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #ddd;
-        font-size: 16px;
-      }
-
-      button {
-        width: 100%;
-        padding: 12px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        cursor: pointer;
-      }
-
-      button:hover {
-        background-color: #0056b3;
-      }
-
-      p {
-        text-align: center;
-        margin-top: 20px;
-      }
-
-      p a {
-        color: #007bff;
-        text-decoration: none;
-      }
-
-      p a:hover {
-        text-decoration: underline;
-      }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <div class="container">
-      <div class="form-container">
-        <h2>Login</h2>
-        <form id="loginForm" method="POST" action="http://localhost:8080/login">
-          <div class="input-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required />
-          </div>
-          <div class="input-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required />
-          </div>
-          <button type="submit">Login</button>
-        </form>
-        <p>Don't have an account? <a href="http://localhost:8080/register">Register</a></p>
-      </div>
+  <body class="flex items-center justify-center h-screen bg-gray-100">
+    <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+      <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700"
+            >Email</label
+          >
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+          />
+        </div>
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700"
+            >Password</label
+          >
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+        >
+          Login
+        </button>
+      </form>
+      <p class="mt-4 text-center text-sm">
+        Don't have an account?
+        <a href="/register" class="text-blue-500 hover:underline">Register</a>
+      </p>
     </div>
+
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          const formData = new URLSearchParams();
+          formData.append("email", email);
+          formData.append("password", password);
+
+          try {
+            const response = await fetch("http://localhost:8080/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: "vardaan " + formData.toString(),
+            });
+            if (response.status == 200) {
+              alert("Login successful");
+              window.location.replace("http://localhost:8080/url-shortener");
+            } else {
+              alert(data.message || "Login failed");
+            }
+          } catch (error) {
+            alert("An error occurred");
+          }
+        });
+    </script>
   </body>
 </html>

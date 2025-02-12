@@ -113,21 +113,10 @@ private:
 
         std::string body;
         std::string line;
-        bool bodyFlag = false;
         while (std::getline(requestStream, line))
         {
-            if (line.empty())
-            {
-                break;
-            }
-            if (bodyFlag)
-            {
-                body = line;
-                bodyFlag = false;
-            }
-            if (line[0] == 13)
-            {
-                bodyFlag = true;
+            if(line.substr(0,7) == "vardaan" || !line.substr(0,7).compare("vardaan")){
+                body = line.substr(8);
             }
             if(line.find("Cookie")!=std::string::npos){
                 refreshToken = extractRefreshToken(line);

@@ -19,7 +19,6 @@ void handleRegister(int clientSockfd, const std::string &method, const std::stri
     else if (method == "POST")
     {
         std::map<std::string, std::string> parsedData = parseQueryString(body);
-
         if (parsedData.find("email") == parsedData.end() || parsedData.find("password") == parsedData.end() || parsedData.find("confirmPassword") == parsedData.end() || parsedData.find("username") == parsedData.end())
         {
             std::string response = generateResponse(400, "Bad Request", "text/plain", "Missing email or password",{});
@@ -41,6 +40,7 @@ void handleRegister(int clientSockfd, const std::string &method, const std::stri
         std::string salt = generateSalt(16);
         std::string saltedPassword = salt + parsedData["password"];
         std::string hashedPassword = hashPassword(saltedPassword);
+
         User user(parsedData["username"], parsedData["email"], hashedPassword, salt);
         user.serialize("/home/vardaan/low level coding/Web Server/data/database.txt");
         response = generateResponse(200, "OK", "text", "Registration Successful",{});

@@ -4,194 +4,113 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>URL Shortener</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: "Arial", sans-serif;
-        background: linear-gradient(135deg, #4facfe, #00f2fe);
-        color: #333;
-        display: flex;
-        width: 100vw;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-      }
-
-      .container {
-        background: #fff;
-        padding: 2rem;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        width:auto;
-        text-align: center;
-      }
-
-      .container h1 {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-        color: #007bff;
-      }
-
-      .form-group {
-        margin-bottom: 1.5rem;
-        text-align: left;
-      }
-
-      label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: bold;
-      }
-
-      input[type="text"] {
-        width: 100%;
-        padding: 0.8rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 1rem;
-      }
-
-      button {
-        background-color: #007bff;
-        color: #fff;
-        padding: 0.8rem 1.5rem;
-        border: none;
-        border-radius: 4px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-
-      button:hover {
-        background-color: #0056b3;
-      }
-
-      .error {
-        color: red;
-        margin-top: 1rem;
-      }
-
-      .result-table {
-        margin-top: 2rem;
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      .result-table th,
-      .result-table td {
-        border: 1px solid #ddd;
-        padding: 0.8rem;
-        text-align: left;
-      }
-
-      .result-table th {
-        background-color: #f2f2f2;
-      }
-
-      .result-table a {
-        color: #007bff;
-        text-decoration: none;
-      }
-
-      .result-table a:hover {
-        text-decoration: underline;
-      }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <div class="container">
-      <h1>URL Shortener</h1>
-      <form id="url-form">
-        <div class="form-group">
-          <label for="original-url">Original URL</label>
+  <body
+    class="bg-gradient-to-br from-blue-400 to-cyan-500 min-h-screen flex justify-center items-center p-8"
+  >
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full h-full">
+      <h1 class="text-2xl font-bold text-center text-blue-600 mb-6">
+        URL Shortener
+      </h1>
+
+      <form id="url-form" class="space-y-4">
+        <div class="flex flex-col">
+          <label for="original-url" class="font-semibold text-gray-700"
+            >Original URL</label
+          >
           <input
             type="text"
             id="original-url"
+            class="border border-gray-300 p-2 rounded-md"
             placeholder="Enter the URL to shorten"
             required
           />
         </div>
-        <button type="submit">Shorten URL</button>
+
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+        >
+          Shorten URL
+        </button>
       </form>
 
-      <div id="error-message" class="error" style="display: none"></div>
+      <div id="error-message" class="text-red-600 mt-4 hidden"></div>
 
-      <table class="result-table" id="result-table">
+      <table
+        id="result-table"
+        class="w-full mt-6 table-auto border-collapse"
+      >
         <thead>
           <tr>
-            <th>Original URL</th>
-            <th>Shortened URL</th>
+            <th class="border p-2 text-left bg-gray-100">Original URL</th>
+            <th class="border p-2 text-left bg-gray-100">Shortened URL</th>
           </tr>
-          {{data}}
         </thead>
+        {{data}}
         <tbody id="result-body"></tbody>
       </table>
     </div>
 
     <script>
-      document
-        .getElementById("url-form")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
+      const form = document.getElementById("url-form");
+      const originalUrlInput = document.getElementById("original-url");
+      const errorMessageDiv = document.getElementById("error-message");
+      const resultTable = document.getElementById("result-table");
+      const resultBody = document.getElementById("result-body");
 
-          const originalUrl = document
-            .getElementById("original-url")
-            .value.trim();
-          const errorMessageDiv = document.getElementById("error-message");
-          const resultTable = document.getElementById("result-table");
-          const resultBody = document.getElementById("result-body");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-          if (!originalUrl) {
-            errorMessageDiv.textContent = "Please enter a valid URL.";
-            errorMessageDiv.style.display = "block";
-            resultTable.style.display = "none";
-            return;
-          }
+        const originalUrl = originalUrlInput.value.trim();
 
-          errorMessageDiv.style.display = "none";
+        if (!originalUrl) {
+          showError("Please enter a valid URL.");
+          return;
+        }
 
+        hideError();
+        try {
           const params = new URLSearchParams();
           params.append("url", originalUrl);
 
-          fetch("http://localhost:8080/url-shortener", {
+          const response = await fetch("http://localhost:8080/url-shortener", {
             method: "POST",
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
             },
             credentials: "include",
-            body: params.toString(),
-          })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error("Failed to shorten URL.");
-              }
-              return response.text();
-            })
-            .then((data) => {
-              const shortened = data;
+            body: "vardaan " + params.toString(),
+          });
 
-              const row = document.createElement("tr");
-              row.innerHTML = `
-                <td>${originalUrl}</td>
-                <td><a href="${shortened}" target="_blank">${shortened}</a></td>
-              `;
-              resultBody.appendChild(row);
+          const data = await response.text();
 
-              resultTable.style.display = "table";
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-              errorMessageDiv.textContent =
-                "An error occurred while shortening the URL.";
-              errorMessageDiv.style.display = "block";
-              resultTable.style.display = "none";
-            });
-        });
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td class="border p-2">${originalUrl}</td>
+            <td class="border p-2">
+              <a href="${data}" class="text-blue-600 hover:underline" target="_blank">${data}</a>
+            </td>
+          `;
+          resultBody.appendChild(row);
+
+          resultTable.classList.remove("hidden");
+        } catch (error) {
+          console.error("Error:", error);
+          showError("An error occurred while shortening the URL.");
+        }
+      });
+
+      function showError(message) {
+        errorMessageDiv.textContent = message;
+        errorMessageDiv.classList.remove("hidden");
+        resultTable.classList.add("hidden");
+      }
+
+      function hideError() {
+        errorMessageDiv.classList.add("hidden");
+      }
     </script>
   </body>
 </html>
